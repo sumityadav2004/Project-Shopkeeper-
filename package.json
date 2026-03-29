@@ -1,0 +1,11 @@
+{
+  "name": "shopkeeper",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix web\"",
+    "start": "concurrently -n server,web \"npm run start --prefix server\" \"npm run start --prefix web\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
