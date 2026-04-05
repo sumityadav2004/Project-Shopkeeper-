@@ -16,7 +16,7 @@ export default function HomePage() {
 
   if (!ready) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md items-center justify-center px-4 text-sm text-zinc-500">
+      <main className="mx-auto flex min-h-screen max-w-md items-center justify-center px-4 text-sm text-muted-foreground">
         Loading...
       </main>
     );

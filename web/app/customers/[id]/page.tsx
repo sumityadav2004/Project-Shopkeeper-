@@ -23,7 +23,7 @@ export default function CustomerPage() {
   const isValidCustomerId = /^[a-f\d]{24}$/i.test(id);
 
   if (!ready) {
-    return <main className="p-6 text-sm text-zinc-500">Loading...</main>;
+    return <main className="p-6 text-sm text-muted-foreground">Loading...</main>;
   }
 
   if (!loggedIn) {
@@ -33,10 +33,10 @@ export default function CustomerPage() {
   if (!isValidCustomerId) {
     return (
       <main className="mx-auto max-w-2xl p-6">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="font-medium text-zinc-900 dark:text-zinc-100">Invalid customer link.</p>
-          <p className="mt-1 text-zinc-500">Please select a customer from the customers page.</p>
-          <Link href="/customers" className="mt-3 inline-block text-blue-600 hover:underline dark:text-blue-400">
+        <div className="rounded-xl border border-border bg-card p-5 text-sm">
+          <p className="font-medium text-foreground">Invalid customer link.</p>
+          <p className="mt-1 text-muted-foreground">Please select a customer from the customers page.</p>
+          <Link href="/customers" className="mt-3 inline-block text-primary hover:underline">
             Go to customers
           </Link>
         </div>

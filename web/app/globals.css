@@ -1,22 +1,70 @@
 @import "tailwindcss";
 
+/* Light theme — soft mint neutrals + teal brand */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #f0f7f5;
+  --foreground: #0c1715;
+  --card: #ffffff;
+  --card-foreground: #0c1715;
+  --muted: #e3f0ec;
+  --muted-foreground: #4a5f59;
+  --border: #c9ddd7;
+  --input: #c9ddd7;
+  --ring: #0d9488;
+  --primary: #0d9488;
+  --primary-foreground: #ffffff;
+  --navbar: rgb(255 255 255 / 0.92);
+  --navbar-border: rgb(20 184 166 / 0.22);
+  --hero-from: #0f766e;
+  --hero-via: #0d9488;
+  --hero-to: #115e59;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --brand-foreground: #115e59;
+}
+
+/* Dark theme — deep teal-slate, matched contrast */
+.dark {
+  color-scheme: dark;
+  --brand-foreground: #99f6e4;
+  --background: #0a1110;
+  --foreground: #e8f4f1;
+  --card: #121b19;
+  --card-foreground: #e8f4f1;
+  --muted: #1c2825;
+  --muted-foreground: #8ca8a0;
+  --border: #2a3b36;
+  --input: #2a3b36;
+  --ring: #2dd4bf;
+  --primary: #14b8a6;
+  --primary-foreground: #ffffff;
+  --navbar: rgb(10 17 16 / 0.92);
+  --navbar-border: rgb(45 212 191 / 0.2);
+  --hero-from: #042f2e;
+  --hero-via: #115e59;
+  --hero-to: #134e4a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-brand-foreground: var(--brand-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

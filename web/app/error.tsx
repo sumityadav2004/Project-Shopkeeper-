@@ -2,6 +2,13 @@
 
 import { useEffect } from "react";
 
+function errorMessage(error: Error & { digest?: string }) {
+  if (error && typeof error.message === "string" && error.message.length > 0) {
+    return error.message;
+  }
+  return "Page load error. Dev server restart karke dubara try karein.";
+}
+
 export default function Error({
   error,
   reset,
@@ -14,21 +21,16 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center gap-4 px-4 py-12 text-center">
-      <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-        Kuch galat ho gaya
-      </h1>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        {error.message ||
-          "Page load error. Dev server restart karke dubara try karein."}
-      </p>
+    <main className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center gap-4 px-4 py-12 text-center">
+      <h1 className="text-lg font-semibold text-foreground">Kuch galat ho gaya</h1>
+      <p className="text-sm text-muted-foreground">{errorMessage(error)}</p>
       <button
         type="button"
-        className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
-        onClick={reset}
+        className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        onClick={() => reset()}
       >
         Dobara try karein
       </button>
-    </div>
+    </main>
   );
 }

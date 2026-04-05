@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { apiJson } from "@/lib/api";
+import { apiJson, errorMessageFromUnknown } from "@/lib/api";
 import { parseVoiceLine, type ParsedLine } from "@/lib/parseVoice";
 import AppNavbar from "@/components/AppNavbar";
 
@@ -143,7 +143,7 @@ export default function CustomerWorkspace({ customerId }: { customerId: string }
   }, [customerId]);
 
   useEffect(() => {
-    load().catch((e) => setError(String(e?.message || e)));
+    load().catch((e: unknown) => setError(errorMessageFromUnknown(e)));
   }, [load]);
 
   useEffect(() => {
@@ -268,7 +268,7 @@ Shopkeeper`;
       setCart([]);
       await load();
     } catch (e: unknown) {
-      setError(String(e instanceof Error ? e.message : e));
+      setError(errorMessageFromUnknown(e));
     } finally {
       setBusy(false);
     }
@@ -306,35 +306,40 @@ Shopkeeper`;
     }
   };
 
+  const inputLineClass =
+    "min-w-0 flex-1 rounded-lg border border-input bg-card px-3 py-2.5 text-sm text-foreground";
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-white px-4 py-6 dark:from-zinc-950 dark:to-zinc-900">
+    <main className="min-h-screen bg-gradient-to-b from-muted/90 to-background px-4 py-6">
       <AppNavbar />
       <div className="mx-auto max-w-6xl space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <Link href="/customers" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
+            <Link href="/customers" className="text-sm text-primary hover:underline">
               ← Back to customer list
             </Link>
-            <h1 className="mt-1 text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="mt-1 text-2xl font-semibold text-foreground">
               {customer?.name || "Customer"}
             </h1>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-muted-foreground">
               {customer?.phone || "No phone"} • Balance: ₹{(customer?.balance || 0).toFixed(2)}
             </p>
           </div>
-          <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <p className="text-xs text-zinc-500">Current entry total</p>
-            <p className="text-xl font-semibold">₹{estimatedTotal.toFixed(2)}</p>
+          <div className="rounded-xl border border-border bg-card px-4 py-3">
+            <p className="text-xs text-muted-foreground">Current entry total</p>
+            <p className="text-xl font-semibold text-foreground">₹{estimatedTotal.toFixed(2)}</p>
           </div>
         </div>
 
         {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+            {error}
+          </div>
         ) : null}
 
         <div className="grid gap-6 xl:grid-cols-[1.1fr_1fr]">
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-base font-semibold">Add Items</h2>
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-foreground">Add Items</h2>
             <div className="mt-4 flex flex-col gap-2 md:flex-row">
               <button
                 type="button"
@@ -345,20 +350,20 @@ Shopkeeper`;
                 {listening ? "Listening..." : "Start Mic"}
               </button>
               <input
-                className="min-w-0 flex-1 rounded-lg border border-zinc-300 px-3 py-2.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                className={inputLineClass}
                 placeholder='Example: "2 kilo aata, 1 kilo chini"'
                 value={voiceText}
                 onChange={(e) => setVoiceText(e.target.value)}
               />
               <button
                 type="button"
-                className="rounded-lg border border-zinc-300 bg-zinc-100 px-4 py-2.5 text-sm hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800"
+                className="rounded-lg border border-border bg-muted px-4 py-2.5 text-sm text-foreground hover:bg-muted/80"
                 onClick={addManual}
               >
                 Add
               </button>
             </div>
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-muted-foreground">
               Multiple items ek saath add karne ke liye comma, new line, ya{" "}
               <span className="font-medium">&quot;aur&quot;</span> use karein.
             </p>
@@ -374,11 +379,11 @@ Shopkeeper`;
                       : null;
                   const lineTotal = billingQty != null ? unitRate * billingQty : 0;
                   return (
-                    <li key={line.key} className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-950">
+                    <li key={line.key} className="flex items-center justify-between rounded-lg border border-border bg-muted px-3 py-2 text-sm">
                       <span>
                         {line.itemName} × {line.quantity} {line.unit}
                         {match ? (
-                          <span className="ml-2 text-xs text-zinc-500">
+                          <span className="ml-2 text-xs text-muted-foreground">
                             {billingQty == null
                               ? `(cannot convert ${line.unit} to ${match.unit})`
                               : `@ ₹${unitRate}/${match.unit} = ₹${lineTotal.toFixed(2)}`}
@@ -401,12 +406,12 @@ Shopkeeper`;
                 })}
               </ul>
             ) : (
-              <p className="mt-4 text-sm text-zinc-500">No line added yet.</p>
+              <p className="mt-4 text-sm text-muted-foreground">No line added yet.</p>
             )}
 
             <button
               type="button"
-              className="mt-4 rounded-lg bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+              className="mt-4 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               disabled={busy || !cart.length}
               onClick={saveSale}
             >
@@ -415,13 +420,13 @@ Shopkeeper`;
           </section>
 
           <div className="space-y-6">
-            <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-              <h2 className="text-base font-semibold">Send Bill Message</h2>
-              <p className="mt-1 text-xs text-zinc-500">
+            <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-foreground">Send Bill Message</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
                 Send the same professional message via WhatsApp or SMS. You can edit the text below before sending.
               </p>
               <textarea
-                className="mt-3 min-h-44 w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                className="mt-3 min-h-44 w-full rounded-lg border border-input bg-card px-3 py-2.5 text-sm text-foreground"
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
               />
@@ -436,7 +441,7 @@ Shopkeeper`;
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-500"
+                  className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                   onClick={sendSms}
                   disabled={!hasPhone}
                 >
@@ -444,7 +449,7 @@ Shopkeeper`;
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg border border-zinc-300 bg-zinc-100 px-3 py-2 text-sm hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800"
+                  className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground hover:bg-muted/80"
                   onClick={copyMessage}
                 >
                   Copy Text
@@ -457,23 +462,23 @@ Shopkeeper`;
               ) : null}
             </section>
 
-            <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-              <h2 className="text-base font-semibold">Recent Transactions</h2>
+            <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-foreground">Recent Transactions</h2>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <label className="text-xs text-zinc-500">
+                <label className="text-xs text-muted-foreground">
                   From date
                   <input
                     type="date"
-                    className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="mt-1 w-full rounded-lg border border-input bg-card px-2 py-2 text-sm text-foreground"
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
                   />
                 </label>
-                <label className="text-xs text-zinc-500">
+                <label className="text-xs text-muted-foreground">
                   To date
                   <input
                     type="date"
-                    className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="mt-1 w-full rounded-lg border border-input bg-card px-2 py-2 text-sm text-foreground"
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
                   />
@@ -482,7 +487,7 @@ Shopkeeper`;
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  className="rounded-md border border-zinc-300 bg-zinc-100 px-2.5 py-1 text-xs hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800"
+                  className="rounded-md border border-border bg-muted px-2.5 py-1 text-xs hover:bg-muted/80"
                   onClick={() => {
                     const today = new Date().toISOString().slice(0, 10);
                     setFromDate(today);
@@ -493,7 +498,7 @@ Shopkeeper`;
                 </button>
                 <button
                   type="button"
-                  className="rounded-md border border-zinc-300 bg-zinc-100 px-2.5 py-1 text-xs hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800"
+                  className="rounded-md border border-border bg-muted px-2.5 py-1 text-xs hover:bg-muted/80"
                   onClick={() => {
                     const now = new Date();
                     const first = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -508,7 +513,7 @@ Shopkeeper`;
                 </button>
                 <button
                   type="button"
-                  className="rounded-md border border-zinc-300 bg-zinc-100 px-2.5 py-1 text-xs hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800"
+                  className="rounded-md border border-border bg-muted px-2.5 py-1 text-xs hover:bg-muted/80"
                   onClick={() => {
                     setFromDate("");
                     setToDate("");
@@ -520,19 +525,19 @@ Shopkeeper`;
               {filteredTransactions.length ? (
                 <div className="mt-3 space-y-2">
                   {filteredTransactions.map((tx) => (
-                    <div key={tx._id} className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950">
-                      <div className="flex items-center justify-between text-sm">
+                    <div key={tx._id} className="rounded-lg border border-border bg-muted px-3 py-2">
+                      <div className="flex items-center justify-between text-sm text-foreground">
                         <span>{new Date(tx.createdAt).toLocaleString()}</span>
                         <span className="font-semibold">₹{tx.total.toFixed(2)}</span>
                       </div>
-                      <p className="mt-1 text-xs text-zinc-500">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {tx.items.map((i) => `${i.productName} x ${i.quantity}`).join(", ")}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="mt-3 text-sm text-zinc-500">No transactions found for selected date range.</p>
+                <p className="mt-3 text-sm text-muted-foreground">No transactions found for selected date range.</p>
               )}
             </section>
           </div>

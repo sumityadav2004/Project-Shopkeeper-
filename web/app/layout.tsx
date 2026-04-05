@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
+import { THEME_INIT_SCRIPT } from "@/lib/theme-script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,9 +25,15 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="hi">
+    <html lang="hi" suppressHydrationWarning>
+      <head>
+        <script
+          // Theme before paint — avoids next/script beforeInteractive quirks in App Router
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
       >
         {children}
       </body>

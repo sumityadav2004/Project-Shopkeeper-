@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiJson } from "@/lib/api";
+import { apiJson, errorMessageFromUnknown } from "@/lib/api";
 import AppNavbar from "@/components/AppNavbar";
 
 type Product = { _id: string; name: string; unit: string; ratePerUnit: number };
@@ -25,7 +25,7 @@ export default function ShopkeeperDashboard() {
   }, []);
 
   useEffect(() => {
-    load().catch((e) => setError(String(e.message || e)));
+    load().catch((e: unknown) => setError(errorMessageFromUnknown(e)));
   }, [load]);
 
   const totalOutstanding = useMemo(
@@ -34,41 +34,41 @@ export default function ShopkeeperDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-zinc-50 to-white dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900">
+    <div className="min-h-screen bg-gradient-to-b from-muted/90 via-muted/50 to-background">
       <AppNavbar />
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:px-6 md:py-8">
-        <header className="rounded-2xl border border-zinc-200 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
+        <header className="rounded-2xl border border-border bg-card/90 p-5 shadow-sm backdrop-blur">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-blue-600 dark:text-blue-400">
+              <p className="text-xs font-medium uppercase tracking-wide text-primary">
                 Retail Dashboard
               </p>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
                 Shopkeeper Digital Khata
               </h1>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Voice ya text se entry karo, customer balance instantly update ho.
               </p>
             </div>
-            <div className="text-sm text-zinc-500">Welcome back</div>
+            <div className="text-sm text-muted-foreground">Welcome back</div>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="text-xs text-zinc-500">Active customers</p>
-              <p className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="rounded-xl border border-border bg-muted px-4 py-3">
+              <p className="text-xs text-muted-foreground">Active customers</p>
+              <p className="mt-1 text-xl font-semibold text-foreground">
                 {customers.length}
               </p>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="text-xs text-zinc-500">Products</p>
-              <p className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="rounded-xl border border-border bg-muted px-4 py-3">
+              <p className="text-xs text-muted-foreground">Products</p>
+              <p className="mt-1 text-xl font-semibold text-foreground">
                 {products.length}
               </p>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="text-xs text-zinc-500">Total outstanding</p>
-              <p className="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="rounded-xl border border-border bg-muted px-4 py-3">
+              <p className="text-xs text-muted-foreground">Total outstanding</p>
+              <p className="mt-1 text-xl font-semibold text-foreground">
                 ₹{totalOutstanding.toFixed(2)}
               </p>
             </div>
@@ -77,24 +77,22 @@ export default function ShopkeeperDashboard() {
 
         {error ? (
           <div
-            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
             role="alert"
           >
             {error}
           </div>
         ) : null}
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            Quick actions
-          </h2>
-          <p className="mt-1 text-sm text-zinc-500">
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <h2 className="text-base font-semibold text-foreground">Quick actions</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             Open customers to manage accounts, or items to add products and rates.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
-              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500"
+              className="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               onClick={() => router.push("/customers")}
             >
               Customers
@@ -108,7 +106,7 @@ export default function ShopkeeperDashboard() {
             </button>
             <button
               type="button"
-              className="rounded-lg border border-zinc-300 bg-zinc-100 px-4 py-2.5 text-sm font-medium hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800"
+              className="rounded-lg border border-border bg-muted px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted/80"
               onClick={() => {
                 const first = customers[0]?._id;
                 if (first) router.push(`/customers/${first}`);

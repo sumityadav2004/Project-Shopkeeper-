@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiJson } from "@/lib/api";
+import { apiJson, errorMessageFromUnknown } from "@/lib/api";
 import AppNavbar from "@/components/AppNavbar";
 
 type Customer = { _id: string; name: string; phone: string; balance: number };
@@ -23,7 +23,7 @@ export default function CustomersHub() {
   };
 
   useEffect(() => {
-    load().catch((e) => setError(String(e?.message || e)));
+    load().catch((e: unknown) => setError(errorMessageFromUnknown(e)));
   }, []);
 
   const filtered = useMemo(() => {
@@ -46,48 +46,51 @@ export default function CustomersHub() {
       await load();
       router.push(`/customers/${c._id}`);
     } catch (e: unknown) {
-      setError(String(e instanceof Error ? e.message : e));
+      setError(errorMessageFromUnknown(e));
     } finally {
       setBusy(false);
     }
   };
 
+  const inputClass =
+    "rounded-lg border border-input bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-zinc-50 to-white px-4 py-6 dark:from-zinc-950 dark:to-zinc-900">
+    <main className="min-h-screen bg-gradient-to-b from-muted/90 to-background px-4 py-6">
       <AppNavbar />
       <div className="mx-auto max-w-6xl space-y-6">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h1 className="text-2xl font-semibold">Customers</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <h1 className="text-2xl font-semibold text-foreground">Customers</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Yaha customer add, search aur view management alag page par hai.
           </p>
         </div>
 
         {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
             {error}
           </div>
         ) : null}
 
         <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-base font-semibold">Add Customer</h2>
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-foreground">Add Customer</h2>
             <div className="mt-3 grid gap-2">
               <input
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-950"
+                className={inputClass}
                 placeholder="Customer name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
               />
               <input
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-950"
+                className={inputClass}
                 placeholder="Phone number"
                 value={newPhone}
                 onChange={(e) => setNewPhone(e.target.value)}
               />
               <button
                 type="button"
-                className="rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+                className="rounded-lg bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 onClick={createCustomer}
                 disabled={busy || !newName.trim()}
               >
@@ -96,10 +99,10 @@ export default function CustomersHub() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-base font-semibold">Search & View</h2>
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-foreground">Search & View</h2>
             <input
-              className="mt-3 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-950"
+              className={`mt-3 w-full ${inputClass}`}
               placeholder="Search by name or phone"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -108,17 +111,17 @@ export default function CustomersHub() {
               {filtered.map((c) => (
                 <div
                   key={c._id}
-                  className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+                  className="flex items-center justify-between rounded-lg border border-border bg-muted px-3 py-2 text-sm"
                 >
                   <div>
-                    <p className="font-medium">{c.name}</p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="font-medium text-foreground">{c.name}</p>
+                    <p className="text-xs text-muted-foreground">
                       {c.phone || "No phone"} • Balance ₹{c.balance.toFixed(2)}
                     </p>
                   </div>
                   <button
                     type="button"
-                    className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900"
+                    className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                     onClick={() => router.push(`/customers/${c._id}`)}
                   >
                     View
@@ -126,7 +129,7 @@ export default function CustomersHub() {
                 </div>
               ))}
               {!filtered.length ? (
-                <p className="text-sm text-zinc-500">No customer found.</p>
+                <p className="text-sm text-muted-foreground">No customer found.</p>
               ) : null}
             </div>
           </section>

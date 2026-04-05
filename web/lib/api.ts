@@ -1,5 +1,32 @@
 import { clearAuthToken, getAuthToken } from "@/lib/auth";
 
+/** Normalized text for UI when catching `unknown`. */
+export function errorMessageFromUnknown(err: unknown): string {
+  if (err instanceof Error && err.message.trim()) return err.message;
+  if (typeof err === "string" && err.trim()) return err;
+  return "Something went wrong.";
+}
+
+/** Shapes returned by Express routes (auth uses `message`, CRUD routes often use `error`). */
+type ApiErrorJson = {
+  message?: unknown;
+  error?: unknown;
+};
+
+function pickApiErrorText(parsed: ApiErrorJson): string | null {
+  const m = typeof parsed.message === "string" ? parsed.message.trim() : "";
+  if (m) return m;
+  const e = typeof parsed.error === "string" ? parsed.error.trim() : "";
+  if (e) return e;
+  return null;
+}
+
+/** After `parseJson` on a failed auth/API response body. */
+export function messageFromApiJsonBody(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  return pickApiErrorText(data as ApiErrorJson);
+}
+
 function toNetworkError(err: unknown): Error {
   const msg = err instanceof Error ? err.message : String(err);
   const looksLikeNetwork =
@@ -60,8 +87,8 @@ export async function apiJson<T>(path: string, init?: RequestInit): Promise<T> {
       const t = text.trim();
       if (!t.startsWith("{") && !t.startsWith("[")) return null;
       try {
-        const parsed = JSON.parse(text) as { message?: string };
-        return parsed.message?.trim() || null;
+        const parsed = JSON.parse(text) as ApiErrorJson;
+        return pickApiErrorText(parsed);
       } catch {
         return null;
       }

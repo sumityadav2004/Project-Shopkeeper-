@@ -15,7 +15,7 @@ export default function ItemsPage() {
   }, []);
 
   if (!ready) {
-    return <main className="p-6 text-sm text-zinc-500">Loading...</main>;
+    return <main className="p-6 text-sm text-muted-foreground">Loading...</main>;
   }
 
   if (!loggedIn) {
